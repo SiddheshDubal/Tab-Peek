@@ -1,6 +1,87 @@
-browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log("Received request: ", request);
+// Tab Peek background script.
+// Screenshots each tab when it becomes active and stores a small
+// thumbnail so the popup can show previews.
 
-    if (request.greeting === "hello")
-        return Promise.resolve({ farewell: "goodbye" });
+const CAPTURE_DELAY_MS = 500;
+const THUMB_WIDTH = 480;
+const CAPTURE_QUALITY = 50;   // captureVisibleTab uses 0–100
+const THUMB_QUALITY = 0.7;    // OffscreenCanvas uses 0–1
+
+function storageKey(tabId) {
+  return `thumb:${tabId}`;
+}
+
+//Timeout and wait for page to load before capture
+browser.tabs.onActivated.addListener(({ tabId, windowId }) => {
+  scheduleCapture(tabId, windowId);
 });
+
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === "complete" && tab.active) {
+    scheduleCapture(tabId, tab.windowId);
+  }
+});
+
+
+function scheduleCapture(tabId, windowId) {
+  setTimeout(() => {
+    captureTab(tabId, windowId).catch(() => {
+      // Some pages can't be captured: Safari settings, extension pages,
+      // or sites the user hasn't granted access to. Skip them; the popup
+      // shows a placeholder instead.
+    });
+  }, CAPTURE_DELAY_MS);
+}
+
+
+//Taking the Screen shot
+async function captureTab(tabId, windowId) {
+  // The user may have switched away during the delay.
+  const tab = await browser.tabs.get(tabId);
+  if (!tab.active) return;
+
+  const fullSize = await browser.tabs.captureVisibleTab(windowId, {
+    format: "jpeg",
+    quality: CAPTURE_QUALITY,
+  });
+  const thumbnail = await downscale(fullSize, THUMB_WIDTH);
+
+  await browser.storage.local.set({
+    [storageKey(tabId)]: {
+      thumbnail,
+      title: tab.title,
+      url: tab.url,
+      favIconUrl: tab.favIconUrl,
+      capturedAt: Date.now(),
+    },
+  });
+}
+
+// Shrinking of the image
+
+async function downscale(dataUrl, targetWidth) {
+  const blob = await (await fetch(dataUrl)).blob();
+  const bitmap = await createImageBitmap(blob);
+
+  const scale = Math.min(1, targetWidth / bitmap.width);
+  const width = Math.round(bitmap.width * scale);
+  const height = Math.round(bitmap.height * scale);
+
+  const canvas = new OffscreenCanvas(width, height);
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+
+  const small = await canvas.convertToBlob({ type: "image/jpeg", quality: THUMB_QUALITY });
+  return blobToDataUrl(small);
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+
