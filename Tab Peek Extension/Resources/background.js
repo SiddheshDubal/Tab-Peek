@@ -6,6 +6,8 @@ const CAPTURE_DELAY_MS = 500;
 const THUMB_WIDTH = 480;
 const CAPTURE_QUALITY = 50;   // captureVisibleTab uses 0–100
 const THUMB_QUALITY = 0.7;    // OffscreenCanvas uses 0–1
+const MAX_THUMBNAILS = 100;   // Add under the other constants
+
 
 function storageKey(tabId) {
   return `thumb:${tabId}`;
@@ -21,6 +23,15 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     scheduleCapture(tabId, tab.windowId);
   }
 });
+
+// Delete a tab's thumbnail when the tab closes.
+browser.tabs.onRemoved.addListener((tabId) => {
+  browser.storage.local.remove(storageKey(tabId));
+});
+
+// Each time Safari starts this script, drop thumbnails for tabs
+// that no longer exist (tab IDs change after Safari restarts).
+removeStaleThumbnails();
 
 
 function scheduleCapture(tabId, windowId) {
@@ -55,6 +66,7 @@ async function captureTab(tabId, windowId) {
       capturedAt: Date.now(),
     },
   });
+    await keepNewest(MAX_THUMBNAILS);
 }
 
 // Shrinking of the image
@@ -85,3 +97,24 @@ function blobToDataUrl(blob) {
 }
 
 
+// Keep only the newest `limit` thumbnails; delete the rest.
+async function keepNewest(limit) {
+  const stored = await browser.storage.local.get(null);   // null = everything
+  const oldest = Object.entries(stored)
+    .filter((entry) => entry[0].startsWith("thumb:"))
+    .sort((a, b) => b[1].capturedAt - a[1].capturedAt)
+    .slice(limit)
+    .map((entry) => entry[0]);
+  await browser.storage.local.remove(oldest);
+}
+
+// Delete thumbnails whose tab is no longer open.
+async function removeStaleThumbnails() {
+  const tabs = await browser.tabs.query({});              // {} = all tabs, all windows
+  const openKeys = new Set(tabs.map((tab) => storageKey(tab.id)));
+  const stored = await browser.storage.local.get(null);
+  const stale = Object.keys(stored).filter(
+    (key) => key.startsWith("thumb:") && !openKeys.has(key)
+  );
+  await browser.storage.local.remove(stale);
+}
