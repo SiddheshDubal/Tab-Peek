@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <clipPath id="pic"><rect x="40" y="92" width="440" height="196" rx="22"/></clipPath>
+  </defs>
+  <g transform="translate(512 512) scale(1.1) translate(-495 -511)">
+    <g transform="translate(211 560)"><path d="M0 36 V20 Q0 0 20 0 H92 Q106 0 112 14 L122 36 H340 Q360 36 360 56 V260 Q360 280 340 280 H20 Q0 280 0 260 Z" fill="#F9C24A" stroke="#8A5A00" stroke-opacity="0.55" stroke-width="7" stroke-linejoin="round"/></g>
+    <g transform="translate(211 560)"><path d="M0 92 H360 V260 Q360 280 340 280 H20 Q0 280 0 260 Z" fill="#FFD978" stroke="#8A5A00" stroke-opacity="0.55" stroke-width="7" stroke-linejoin="round"/></g>
+  </g>
+</svg>
