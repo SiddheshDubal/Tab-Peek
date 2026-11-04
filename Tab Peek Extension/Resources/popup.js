@@ -38,10 +38,23 @@ function showMatchingTabs() {
 
 function makeRow(tab) {
   const row = document.createElement("li");
-  row.textContent = tab.title || tab.url;
+  //row.textContent = tab.title || tab.url;
   if (tab.active) {
     row.classList.add("active");
   }
+    
+    const title = document.createElement("span");
+    title.className = "title";
+    title.textContent = tab.title || tab.url;
+    
+    const close = document.createElement("button");
+    close.className = "close";
+    close.textContent = "×";
+    close.title = "Close Tab";
+    close.setAttribute("aria-label", `Close ${title.textContent}`);
+    close.addEventListener("click", (event) => closeTab(event, tab));
+    
+  row.append(title, close);
   row.addEventListener("click", () => switchTo(tab));
   row.addEventListener("mouseenter", () => schedulePreview(tab));
   return row;
@@ -86,4 +99,12 @@ function clearPreview() {
 async function switchTo(tab) {
   await browser.tabs.update(tab.id, { active: true });
   window.close();
+}
+
+async function closeTab(event, tab){
+    event.stopPropagation();
+    event.currentTarget.disabled = true;
+    await browser.tabs.remove(tab.id);
+    clearPreview();
+    await loadTabs();
 }
