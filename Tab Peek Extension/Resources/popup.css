@@ -29,10 +29,22 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 6px;
+    /*margin-bottom: 6px;*/
     font-size: 12px;
     opacity: 0.8;
     -webkit-user-select: none;
+}
+
+#options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+#hint {
+    opacity: 0.5;
 }
 
 #preview {

@@ -7,13 +7,16 @@
 </head>
 <body>
     <input id="search" type="search" placeholder="Search tabs" autofocus>
-        <label id="all-windows-label">
-            <input id="all-windows" type="checkbox">
-            All windows
-        </label>
+        <div id="options">
+            <label id="all-windows-label">
+                <input id="all-windows" type="checkbox">
+                All windows
+            </label>
+            <span id="hint">Hover a tab to preview it</span>
+        </div>
     <div id="preview">
         <img id="preview-image" alt="" hidden>
-        <p id="preview-text">Hover a tab to preview it</p>
+            <p id="preview-text" hidden>No preview for this tab yet</p>
     </div>
     <ul id="tab-list"></ul>
 </body>

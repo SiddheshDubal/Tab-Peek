@@ -16,7 +16,7 @@ let hoverTimer = null;
 let hoveredTabId = null;
 
 search.addEventListener("input", showMatchingTabs);
-list.addEventListener("mouseleave", clearPreview);
+list.addEventListener("mouseleave", showCurrentPreview);
 allWindowsBox.addEventListener("change", changeWindowsMode);
 start();
 //loadTabs();
@@ -26,17 +26,25 @@ function storageKey(tabId) {
   return `thumb:${tabId}`;
 }
 
+// The tab you're looking at right now: active, and in this window.
+function isCurrentTab(tab) {
+  return tab.active && tab.windowId === currentWindowId;
+}
+
+
 async function start() {
     const saved = await browser.storage.local.get("allWindows");
     allWindowsBox.checked = saved.allWindows === true;
     currentWindowId = (await browser.windows.getCurrent()).id;
     await loadTabs();
+    showCurrentPreview();
 }
 // The checkbox was clicked: save the choice and rebuild the list.
 async function changeWindowsMode() {
   await browser.storage.local.set({ allWindows: allWindowsBox.checked });
-  clearPreview();
-  await loadTabs();
+  //clearPreview();
+    await loadTabs();
+    showCurrentPreview();
 }
 
 
@@ -59,7 +67,7 @@ function showMatchingTabs() {
 function makeRow(tab) {
   const row = document.createElement("li");
   //row.textContent = tab.title || tab.url;
- if (tab.active && tab.windowId === currentWindowId) {
+    if (isCurrentTab(tab)) {
     row.classList.add("active");
   }
     
@@ -106,14 +114,25 @@ async function showPreview(tab) {
   }
 }
 
-// Mouse left the list: cancel any pending preview and reset the card.
+/*/ Mouse left the list: cancel any pending preview and reset the card.
 function clearPreview() {
   clearTimeout(hoverTimer);
   hoveredTabId = null;
   previewImage.hidden = true;
   previewText.textContent = "Hover a tab to preview it";
   previewText.hidden = false;
+}*/
+// Show the tab you're on now: when the popup opens, and when the
+// mouse leaves the list.
+function showCurrentPreview() {
+  clearTimeout(hoverTimer);
+  const current = allTabs.find(isCurrentTab);
+  if (current) {
+    hoveredTabId = current.id;
+    showPreview(current);
+  }
 }
+
 
 // Bring the tab to the front and close the popup.
 async function switchTo(tab) {
@@ -126,6 +145,7 @@ async function closeTab(event, tab){
     event.stopPropagation();
     event.currentTarget.disabled = true;
     await browser.tabs.remove(tab.id);
-    clearPreview();
+    //clearPreview();
     await loadTabs();
+    showCurrentPreview();
 }
