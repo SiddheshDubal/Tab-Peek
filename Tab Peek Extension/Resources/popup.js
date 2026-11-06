@@ -1,5 +1,5 @@
 // Tab Peek popup.
-// Lists the current window's tabs; clicking a row switches to that tab,
+// Lists the current window's tabs (or every window's); clicking a row switches to that tab,
 // hovering a row shows its saved thumbnail.
 
 const HOVER_DELAY_MS = 250;
@@ -8,22 +8,42 @@ const list = document.getElementById("tab-list");
 const search = document.getElementById("search");
 const previewImage = document.getElementById("preview-image");
 const previewText = document.getElementById("preview-text");
+const allWindowsBox = document.getElementById("all-windows");
+
 let allTabs = [];
+let currentWindowId = null;
 let hoverTimer = null;
 let hoveredTabId = null;
 
 search.addEventListener("input", showMatchingTabs);
 list.addEventListener("mouseleave", clearPreview);
-loadTabs();
+allWindowsBox.addEventListener("change", changeWindowsMode);
+start();
+//loadTabs();
 
 // Same key format as background.js (its functions are private to it).
 function storageKey(tabId) {
   return `thumb:${tabId}`;
 }
 
+async function start() {
+    const saved = await browser.storage.local.get("allWindows");
+    allWindowsBox.checked = saved.allWindows === true;
+    currentWindowId = (await browser.windows.getCurrent()).id;
+    await loadTabs();
+}
+// The checkbox was clicked: save the choice and rebuild the list.
+async function changeWindowsMode() {
+  await browser.storage.local.set({ allWindows: allWindowsBox.checked });
+  clearPreview();
+  await loadTabs();
+}
+
+
 async function loadTabs() {
-  allTabs = await browser.tabs.query({ currentWindow: true });
-  showMatchingTabs();
+    const which = allWindowsBox.checked ? {} : { currentWindow: true };
+    allTabs = await browser.tabs.query(which);
+    showMatchingTabs();
 }
 
 // Show only the tabs whose title or URL contains the search text.
@@ -39,7 +59,7 @@ function showMatchingTabs() {
 function makeRow(tab) {
   const row = document.createElement("li");
   //row.textContent = tab.title || tab.url;
-  if (tab.active) {
+ if (tab.active && tab.windowId === currentWindowId) {
     row.classList.add("active");
   }
     
@@ -97,8 +117,9 @@ function clearPreview() {
 
 // Bring the tab to the front and close the popup.
 async function switchTo(tab) {
-  await browser.tabs.update(tab.id, { active: true });
-  window.close();
+    await browser.tabs.update(tab.id, { active: true });
+    await browser.windows.update(tab.windowId, { focused: true });
+    window.close();
 }
 
 async function closeTab(event, tab){
