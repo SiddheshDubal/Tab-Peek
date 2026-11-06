@@ -61,7 +61,41 @@ function showMatchingTabs() {
     (tab.title || "").toLowerCase().includes(text) ||
     (tab.url || "").toLowerCase().includes(text)
   );
-  list.replaceChildren(...matches.map(makeRow));
+  //list.replaceChildren(...matches.map(makeRow));
+    if (!allWindowsBox.checked) {
+      list.replaceChildren(...matches.map(makeRow));
+      return;
+    }
+    list.replaceChildren(...rowsByWindow(matches));
+}
+
+// Every window's ID: this window first, then the others in Safari's order.
+function windowOrder() {
+  const others = allTabs
+    .map((tab) => tab.windowId)
+    .filter((id) => id !== currentWindowId);
+  return [currentWindowId, ...new Set(others)];
+}
+
+// A header for each window, followed by that window's rows.
+// Windows with no matching tabs are left out.
+function rowsByWindow(matches) {
+  const rows = [];
+  windowOrder().forEach((windowId, index) => {
+    const tabs = matches.filter((tab) => tab.windowId === windowId);
+    if (tabs.length === 0) return;
+    rows.push(makeHeader(index === 0 ? "This window" : `Window ${index + 1}`));
+    rows.push(...tabs.map(makeRow));
+  });
+  return rows;
+}
+
+// A label row: no click or hover listeners, so it does nothing.
+function makeHeader(text) {
+  const header = document.createElement("li");
+  header.className = "window-header";
+  header.textContent = text;
+  return header;
 }
 
 function makeRow(tab) {
