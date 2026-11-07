@@ -2,12 +2,27 @@
     color-scheme: light dark;
 
     /* Light mode colors. Dark mode changes them at the bottom. */
-    --hover-bg: rgba(128, 128, 128, 0.15);
-    --active-bg: rgba(0, 122, 255, 0.2);
-    --card-bg: rgba(128, 128, 128, 0.1);
-    --card-border: rgba(0, 0, 0, 0.1);
+    /* Each color: light value, then dark value. */
+    /*--hover-bg: light-dark(rgba(128, 128, 128, 0.15), rgba(255, 255, 255, 0.1));
+    --active-bg: light-dark(rgba(0, 122, 255, 0.2), rgba(10, 132, 255, 0.35));
+    --card-bg: light-dark(rgba(128, 128, 128, 0.1), rgba(255, 255, 255, 0.06));
+    --card-border: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.12));
+    */
+    --hover-bg: color-mix(in srgb, CanvasText 10%, transparent);
+    --active-bg: color-mix(in srgb, AccentColor 30%, transparent);
+    --card-bg: color-mix(in srgb, CanvasText 6%, transparent);
+    --card-border: color-mix(in srgb, CanvasText 12%, transparent);
     --popup-radius: 20px;
     --inner-radius: calc(var(--popup-radius) - 8px);
+}
+
+/* A theme picked in Settings beats macOS's. No data-theme = Auto. */
+:root[data-theme="light"] {
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
 }
 
 body {
@@ -196,7 +211,7 @@ body {
     background: var(--hover-bg);
 }
 
-
+/*
 @media (prefers-color-scheme: dark) {
     :root {
         --hover-bg: rgba(255, 255, 255, 0.1);
@@ -205,3 +220,4 @@ body {
         --card-border: rgba(255, 255, 255, 0.12);
     }
 }
+*/

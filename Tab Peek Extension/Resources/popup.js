@@ -2,6 +2,8 @@
 // Lists the current window's tabs (or every window's); clicking a row switches to that tab,
 // hovering a row shows its saved thumbnail.
 
+import { applyTheme } from "./theme.js";
+
 const HOVER_DELAY_MS = 250;
 
 const list = document.getElementById("tab-list");
@@ -42,6 +44,8 @@ async function start() {
     await loadTabs();
     showCurrentPreview();
 }
+applyTheme();
+
 // The checkbox was clicked: save the choice and rebuild the list.
 async function changeWindowsMode() {
   await browser.storage.local.set({ allWindows: allWindowsBox.checked });
