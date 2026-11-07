@@ -1,0 +1,19 @@
+:root {
+    color-scheme: light dark;
+}
+
+body {
+    max-width: 560px;
+    margin: 40px auto;
+    padding: 0 16px;
+    font-family: system-ui;
+    font-size: 13px;
+}
+
+h1 {
+    font-size: 22px;
+}
+
+#intro {
+    opacity: 0.6;
+}

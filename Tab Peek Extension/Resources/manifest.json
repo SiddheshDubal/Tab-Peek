@@ -25,6 +25,11 @@
         "default_popup": "popup.html",
         "default_icon": "images/toolbar-icon.svg"
     },
+    
+    
+    "options_ui": {
+        "page": "options.html"
+    },
 
     "permissions": [ "tabs","storage"],
     "host_permissions": ["<all_urls>"]

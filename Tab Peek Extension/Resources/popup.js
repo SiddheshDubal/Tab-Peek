@@ -9,6 +9,7 @@ const search = document.getElementById("search");
 const previewImage = document.getElementById("preview-image");
 const previewText = document.getElementById("preview-text");
 const allWindowsBox = document.getElementById("all-windows");
+const settingsButton = document.getElementById("open-settings");
 
 let allTabs = [];
 let currentWindowId = null;
@@ -18,6 +19,8 @@ let hoveredTabId = null;
 search.addEventListener("input", showMatchingTabs);
 list.addEventListener("mouseleave", showCurrentPreview);
 allWindowsBox.addEventListener("change", changeWindowsMode);
+settingsButton.addEventListener("click", openSettings);
+
 start();
 //loadTabs();
 
@@ -191,6 +194,13 @@ async function switchTo(tab) {
     await browser.tabs.update(tab.id, { active: true });
     await browser.windows.update(tab.windowId, { focused: true });
     window.close();
+}
+
+
+// Open Tab Peek's settings page in a tab and close the popup.
+async function openSettings() {
+  await browser.runtime.openOptionsPage();
+  window.close();
 }
 
 async function closeTab(event, tab){
