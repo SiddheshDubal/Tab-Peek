@@ -84,17 +84,35 @@ function rowsByWindow(matches) {
   windowOrder().forEach((windowId, index) => {
     const tabs = matches.filter((tab) => tab.windowId === windowId);
     if (tabs.length === 0) return;
-    rows.push(makeHeader(index === 0 ? "This window" : `Window ${index + 1}`));
+    rows.push(makeHeader(index === 0 ? "This window" : `Window ${index + 1}`, windowId));
     rows.push(...tabs.map(makeRow));
   });
   return rows;
 }
 
 // A label row: no click or hover listeners, so it does nothing.
-function makeHeader(text) {
+function makeHeader(text, windowId) {
   const header = document.createElement("li");
   header.className = "window-header";
-  header.textContent = text;
+  //header.textContent = text;
+    
+    const label = document.createElement("span");
+    label.className = "title";
+    label.textContent = text;
+    header.append(label);
+
+    // Only other windows: closing this one would close the popup too.
+    if (windowId !== currentWindowId) {
+      const close = document.createElement("button");
+      close.className = "close";
+      close.textContent = "×";
+      close.title = "Close Window";
+      close.setAttribute("aria-label", `Close ${text}`);
+      close.addEventListener("click", (event) => closeWindow(event, windowId));
+      close.addEventListener("mouseleave", () => resetCloseWindow(close));
+      header.append(close);
+    }
+    
   return header;
 }
 
@@ -182,4 +200,25 @@ async function closeTab(event, tab){
     //clearPreview();
     await loadTabs();
     showCurrentPreview();
+}
+
+// First click asks, second click closes the window and all its tabs.
+async function closeWindow(event, windowId) {
+  const button = event.currentTarget;
+  if (!button.classList.contains("confirm")) {
+    const count = allTabs.filter((tab) => tab.windowId === windowId).length;
+    button.classList.add("confirm");
+    button.textContent = `Close ${count} ${count === 1 ? "tab" : "tabs"}?`;
+    return;
+  }
+  button.disabled = true;
+  await browser.windows.remove(windowId);
+  await loadTabs();
+  showCurrentPreview();
+}
+
+// The mouse left before the second click: back to a plain ×.
+function resetCloseWindow(button) {
+  button.classList.remove("confirm");
+  button.textContent = "×";
 }

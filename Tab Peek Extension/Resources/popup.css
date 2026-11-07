@@ -147,6 +147,15 @@ body {
     background: var(--hover-bg);
 }
 
+/* Closing a window, second step: the × becomes a question. */
+#tab-list li .close.confirm {
+    width: auto;
+    padding: 0 6px;
+    border-radius: 9px;
+    font-size: 11px;
+    opacity: 1;
+    background: var(--hover-bg);
+}
 
 
 @media (prefers-color-scheme: dark) {
