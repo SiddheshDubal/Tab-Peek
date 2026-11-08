@@ -83,6 +83,17 @@ Tested on macOS 27 with Safari 27.
 - `Tab Peek Extension/Resources/`: the extension itself (manifest,
   background script, popup, settings page)
 
+## License
+
+Copyright (C) 2026 SiddheshDubal
+
+Tab Peek is free software, licensed under the GNU General Public License
+v3.0. See `LICENSE` for the full text.
+
+**Additional terms (GPL-3.0 section 7(b)):** the settings page shows the
+author line "Tab Peek by SiddheshDubal". Any copy or modified version you
+share must keep that line in the program's legal notices.
+
 ## Version
 
 2.0

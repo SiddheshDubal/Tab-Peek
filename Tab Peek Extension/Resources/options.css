@@ -126,3 +126,13 @@ label {
 .help.open .help-text {
     display: block;
 }
+
+
+/* Author, copyright and license line at the bottom of the page. */
+#credits {
+    margin-top: 40px;
+    padding-top: 12px;
+    border-top: 1px solid color-mix(in srgb, CanvasText 15%, transparent);
+    font-size: 11px;
+    opacity: 0.6;
+}
