@@ -2,6 +2,7 @@
 // extension. A setting nobody has changed yet uses its default.
 export const DEFAULTS = {
     maxThumbnails: 100,
+    thumbnailWidth: 480,
     hoverDelayMs: 250,
     theme: "auto",
     
