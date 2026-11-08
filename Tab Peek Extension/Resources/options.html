@@ -8,11 +8,119 @@
 </head>
 <body>
     <h1>Tab Peek Settings</h1>
-    <p id="intro">More settings are coming. The first one will be the theme.</p>
+    <p id="intro">Changes are saved as soon as you make them.</p>
     
-    <h2>Theme</h2>
+    
+    <div class="section-title">
+        <h2>Thumbnails</h2>
+        <button class="reset" id="reset-max-thumbnails" hidden>Reset to default</button>
+    </div>
+        
+    <div class="setting">
+        <label>
+            Keep up to
+            <input id="max-thumbnails" type="number" min="10" max="500" step="10">
+            thumbnails
+        </label>
+        
+        <span class="help">
+            <button class="help-button" aria-label="What does this do?">?</button>
+            <span class="help-text">Tab Peek saves a small screenshot of each tab you view. When there are more than this, the oldest ones are deleted. More thumbnails use more disk space.</span>
+        </span>
+    </div>
+    
+    
+    
+    <p class="note"><span id="thumb-count">0</span> saved right now.</p>
+    
+    <div class="setting">
+        <button id="delete-thumbnails">Delete all thumbnails</button>
+        <span class="help">
+            <button class="help-button" aria-label="What does this do?">?</button>
+            <span class="help-text">Removes every saved screenshot. Each tab gets a new one the next time you view it. Your settings are kept.</span>
+        </span>
+    </div>
+    
+    <div class="section-title">
+        <h2>Theme</h2>
+        
+        <span class="help">
+            <button class="help-button" aria-label="What does this do?">?</button>
+            <span class="help-text">Auto follows macOS (System Settings → Appearance). Light or Dark keeps Tab Peek's popup and this page in that look, whatever macOS uses.</span>
+        </span>
+        
+        <button class="reset" id="reset-theme" hidden>Reset to default</button>
+    </div>
+   
     <label><input type="radio" name="theme" value="auto"> Auto (follow macOS)</label>
     <label><input type="radio" name="theme" value="light"> Light</label>
     <label><input type="radio" name="theme" value="dark"> Dark</label>
+    
+    
+    <div class="section-title">
+        <h2>Popup</h2>
+        <button class="reset" id="reset-popup" hidden>Reset to default</button>
+    </div>
+    
+    
+    <div class="setting">
+        <label for="list-height">Tab list height</label>
+        <select id="list-height">
+            <option value="200">Short</option>
+            <option value="300">Medium</option>
+            <option value="400">Tall</option>
+        </select>
+        <span class="help">
+            <button class="help-button" aria-label="What does this do?">?</button>
+            <span class="help-text">How tall the list of tabs can grow before it starts scrolling. Taller shows more tabs at once.</span>
+        </span>
+    </div>
+
+    <div class="setting">
+        <label><input id="show-preview" type="checkbox"> Show the preview card</label>
+        <span class="help">
+            <button class="help-button" aria-label="What does this do?">?</button>
+            <span class="help-text">The screenshot area above the tab list. Turn it off for a short, plain list you only search and click. Thumbnails are still saved, so turning it back on shows them again.</span>
+        </span>
+    </div>
+
+    <div class="setting">
+        <label for="hover-delay">Preview delay</label>
+        <input id="hover-delay" type="range" min="0" max="1000" step="50">
+        <input id="hover-delay-number" type="number" min="0" max="1000" step="50">
+        <span>ms</span>
+        <span class="help">
+            <button class="help-button" aria-label="What does this do?">?</button>
+            <span class="help-text">How long the mouse has to rest on a tab in the list before its preview appears. Shorter feels quicker. Longer avoids previews flashing by as you move across the list. 1000 ms is one second.</span>
+        </span>
+    </div>
+
+    <div class="setting">
+        <label><input id="show-hint" type="checkbox"> Show the hover hint</label>
+        <span class="help">
+            <button class="help-button" aria-label="What does this do?">?</button>
+            <span class="help-text">The faint "Hover a tab to preview it" text next to All windows in the popup.</span>
+        </span>
+    </div>
+
+    <div class="setting">
+        <label><input id="confirm-close-tab" type="checkbox"> Ask before closing a tab</label>
+        <span class="help">
+            <button class="help-button" aria-label="What does this do?">?</button>
+            <span class="help-text">A tab's × first turns into "Close?", and a second click closes the tab. Moving the mouse away cancels.</span>
+        </span>
+    </div>
+
+    <div class="setting">
+        <label><input id="confirm-close-window" type="checkbox"> Ask before closing a window</label>
+        <span class="help">
+            <button class="help-button" aria-label="What does this do?">?</button>
+            <span class="help-text">A window's × first asks "Close N tabs?", and a second click closes the window with all its tabs. Moving the mouse away cancels.</span>
+        </span>
+    </div>
+    
+    
+    
+<button id="reset-all" hidden>Reset all settings to defaults</button>
 </body>
 </html>

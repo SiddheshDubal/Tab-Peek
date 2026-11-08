@@ -3,8 +3,8 @@
 // hovering a row shows its saved thumbnail.
 
 import { applyTheme } from "./theme.js";
+import { loadSettings } from "./settings.js";
 
-const HOVER_DELAY_MS = 250;
 
 const list = document.getElementById("tab-list");
 const search = document.getElementById("search");
@@ -12,11 +12,14 @@ const previewImage = document.getElementById("preview-image");
 const previewText = document.getElementById("preview-text");
 const allWindowsBox = document.getElementById("all-windows");
 const settingsButton = document.getElementById("open-settings");
+const hint = document.getElementById("hint");
+const previewCard = document.getElementById("preview");
 
 let allTabs = [];
 let currentWindowId = null;
 let hoverTimer = null;
 let hoveredTabId = null;
+let settings = null;
 
 search.addEventListener("input", showMatchingTabs);
 list.addEventListener("mouseleave", showCurrentPreview);
@@ -41,6 +44,10 @@ async function start() {
     const saved = await browser.storage.local.get("allWindows");
     allWindowsBox.checked = saved.allWindows === true;
     currentWindowId = (await browser.windows.getCurrent()).id;
+    settings = await loadSettings();
+    hint.hidden = !settings.showHint || !settings.showPreview;
+    previewCard.hidden = !settings.showPreview;
+    list.style.maxHeight = `${settings.listHeight}px`;
     await loadTabs();
     showCurrentPreview();
 }
@@ -97,7 +104,7 @@ function rowsByWindow(matches) {
   return rows;
 }
 
-// A label row: no click or hover listeners, so it does nothing.
+// A window's label row. Other windows' rows can be clicked (bring to front) or closed (×).
 function makeHeader(text, windowId) {
   const header = document.createElement("li");
   header.className = "window-header";
@@ -110,13 +117,17 @@ function makeHeader(text, windowId) {
 
     // Only other windows: closing this one would close the popup too.
     if (windowId !== currentWindowId) {
+        header.classList.add("clickable");
+        header.title = "Bring this window to the front";
+        header.addEventListener("click", () => focusWindow(windowId));
+        
       const close = document.createElement("button");
       close.className = "close";
       close.textContent = "×";
       close.title = "Close Window";
       close.setAttribute("aria-label", `Close ${text}`);
       close.addEventListener("click", (event) => closeWindow(event, windowId));
-      close.addEventListener("mouseleave", () => resetCloseWindow(close));
+      close.addEventListener("mouseleave", () => resetCloseButton(close));
       header.append(close);
     }
     
@@ -140,6 +151,7 @@ function makeRow(tab) {
     close.title = "Close Tab";
     close.setAttribute("aria-label", `Close ${title.textContent}`);
     close.addEventListener("click", (event) => closeTab(event, tab));
+    close.addEventListener("mouseleave", () => resetCloseButton(close));
     
   row.append(title, close);
   row.addEventListener("click", () => switchTo(tab));
@@ -151,7 +163,7 @@ function makeRow(tab) {
 function schedulePreview(tab) {
   clearTimeout(hoverTimer);
   hoveredTabId = tab.id;
-  hoverTimer = setTimeout(() => showPreview(tab), HOVER_DELAY_MS);
+  hoverTimer = setTimeout(() => showPreview(tab), settings.hoverDelayMs);
 }
 
 async function showPreview(tab) {
@@ -200,6 +212,11 @@ async function switchTo(tab) {
     window.close();
 }
 
+// Bring a whole window to the front and close the popup.
+async function focusWindow(windowId) {
+  await browser.windows.update(windowId, { focused: true });
+  window.close();
+}
 
 // Open Tab Peek's settings page in a tab and close the popup.
 async function openSettings() {
@@ -209,7 +226,13 @@ async function openSettings() {
 
 async function closeTab(event, tab){
     event.stopPropagation();
-    event.currentTarget.disabled = true;
+    const button = event.currentTarget;
+    if (settings.confirmCloseTab && !button.classList.contains("confirm")) {
+      button.classList.add("confirm");
+      button.textContent = "Close?";
+      return;
+    }
+    button.disabled = true;
     await browser.tabs.remove(tab.id);
     //clearPreview();
     await loadTabs();
@@ -218,8 +241,9 @@ async function closeTab(event, tab){
 
 // First click asks, second click closes the window and all its tabs.
 async function closeWindow(event, windowId) {
+    event.stopPropagation();
   const button = event.currentTarget;
-  if (!button.classList.contains("confirm")) {
+    if (settings.confirmCloseWindow && !button.classList.contains("confirm")) {
     const count = allTabs.filter((tab) => tab.windowId === windowId).length;
     button.classList.add("confirm");
     button.textContent = `Close ${count} ${count === 1 ? "tab" : "tabs"}?`;
@@ -232,7 +256,7 @@ async function closeWindow(event, windowId) {
 }
 
 // The mouse left before the second click: back to a plain ×.
-function resetCloseWindow(button) {
+function resetCloseButton(button) {
   button.classList.remove("confirm");
   button.textContent = "×";
 }

@@ -2,11 +2,14 @@
 // Screenshots each tab when it becomes active and stores a small
 // thumbnail so the popup can show previews.
 
+
+import { loadSettings } from "./settings.js";
+
 const CAPTURE_DELAY_MS = 500;
 const THUMB_WIDTH = 480;
 const CAPTURE_QUALITY = 50;   // captureVisibleTab uses 0–100
 const THUMB_QUALITY = 0.7;    // OffscreenCanvas uses 0–1
-const MAX_THUMBNAILS = 100;   // Add under the other constants
+//const MAX_THUMBNAILS = 100;   // Add under the other constants
 
 
 function storageKey(tabId) {
@@ -66,7 +69,8 @@ async function captureTab(tabId, windowId) {
       capturedAt: Date.now(),
     },
   });
-    await keepNewest(MAX_THUMBNAILS);
+    const { maxThumbnails } = await loadSettings();
+    await keepNewest(maxThumbnails);
 }
 
 // Shrinking of the image

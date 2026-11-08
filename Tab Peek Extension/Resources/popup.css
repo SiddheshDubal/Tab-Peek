@@ -113,6 +113,12 @@ body {
     background: var(--card-bg);
 }
 
+/* The preview card can be turned off in Settings. Its display: flex above
+   would otherwise beat the hidden attribute. */
+#preview[hidden] {
+    display: none;
+}
+
 #preview-image {
     width: 100%;
     height: 100%;
@@ -158,6 +164,11 @@ body {
     text-transform: uppercase;
     opacity: 0.6;
     background: none;
+}
+
+/* Other windows' headers can be clicked to bring that window forward. */
+#tab-list li.window-header.clickable:hover {
+    background: var(--hover-bg);
 }
 
 #tab-list li.active {
