@@ -4,6 +4,9 @@
 
 
 import { loadSettings } from "./settings.js";
+// Chrome and Edge call the extension API `chrome`; Safari and Firefox call it `browser`.
+const browser = globalThis.browser ?? globalThis.chrome;
+
 
 const CAPTURE_DELAY_MS = 500;
 //const THUMB_WIDTH = 480;

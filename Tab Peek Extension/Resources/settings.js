@@ -1,5 +1,10 @@
 // Tab Peek's settings and their defaults, shared by every part of the
 // extension. A setting nobody has changed yet uses its default.
+
+// Chrome and Edge call the extension API `chrome`; Safari and Firefox call it `browser`.
+const browser = globalThis.browser ?? globalThis.chrome;
+
+
 export const DEFAULTS = {
     maxThumbnails: 100,
     thumbnailWidth: 480,

@@ -4,7 +4,8 @@
 
 import { applyTheme } from "./theme.js";
 import { loadSettings } from "./settings.js";
-
+// Chrome and Edge call the extension API `chrome`; Safari and Firefox call it `browser`.
+const browser = globalThis.browser ?? globalThis.chrome;
 
 const list = document.getElementById("tab-list");
 const search = document.getElementById("search");

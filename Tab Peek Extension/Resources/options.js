@@ -1,7 +1,8 @@
 // Tab Peek settings page.
 import { applyTheme } from "./theme.js";
 import { DEFAULTS, loadSettings } from "./settings.js";
-
+// Chrome and Edge call the extension API `chrome`; Safari and Firefox call it `browser`.
+const browser = globalThis.browser ?? globalThis.chrome;
 
 const themeChoices = document.querySelectorAll('input[name="theme"]');
 const maxThumbnailsBox = document.getElementById("max-thumbnails");
