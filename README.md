@@ -96,4 +96,4 @@ share must keep that line in the program's legal notices.
 
 ## Version
 
-2.0
+2.1
