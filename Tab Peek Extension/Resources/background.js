@@ -64,7 +64,7 @@ async function captureTab(tabId, windowId) {
     const { thumbnailWidth, maxThumbnails } = await loadSettings();
     const thumbnail = await downscale(fullSize, thumbnailWidth);
     
-    await browser.storage.local.set({
+    const entry = {
         [storageKey(tabId)]: {
             thumbnail,
             title: tab.title,
@@ -72,7 +72,16 @@ async function captureTab(tabId, windowId) {
             favIconUrl: tab.favIconUrl,
             capturedAt: Date.now(),
         },
-    });
+    };
+    
+    try {
+        await browser.storage.local.set(entry);
+    } catch {
+        // Storage is full (Chrome and Edge allow about 10 MB). Make room
+        // and try once more; if it still fails, scheduleCapture skips it.
+        await makeRoom();
+        await browser.storage.local.set(entry);
+    }
     
     await keepNewest(maxThumbnails);
 }
@@ -114,6 +123,13 @@ async function keepNewest(limit) {
     .slice(limit)
     .map((entry) => entry[0]);
     await browser.storage.local.remove(oldest);
+}
+
+// Delete the oldest tenth of the thumbnails to free some space.
+async function makeRoom() {
+    const stored = await browser.storage.local.get(null);
+    const count = Object.keys(stored).filter((key) => key.startsWith("thumb:")).length;
+    await keepNewest(Math.floor(count * 0.9));
 }
 
 // Delete thumbnails whose tab is no longer open.
