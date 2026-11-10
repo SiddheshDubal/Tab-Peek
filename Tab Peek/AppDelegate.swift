@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Tab Peek
 //
-//  Created by SHREE SIDDHESH DUBAL on 10/25/26.
+//  https://github.com/SiddheshDubal/Tab-Peek
 //
 
 import Cocoa

@@ -136,3 +136,7 @@ label {
     font-size: 11px;
     opacity: 0.6;
 }
+
+#credits a {
+    color: inherit;
+}

@@ -9,10 +9,8 @@ const browser = globalThis.browser ?? globalThis.chrome;
 
 
 const CAPTURE_DELAY_MS = 500;
-//const THUMB_WIDTH = 480;
 const CAPTURE_QUALITY = 50;   // captureVisibleTab uses 0–100
 const THUMB_QUALITY = 0.7;    // OffscreenCanvas uses 0–1
-//const MAX_THUMBNAILS = 100;   // Add under the other constants
 
 
 function storageKey(tabId) {

@@ -28,7 +28,6 @@ allWindowsBox.addEventListener("change", changeWindowsMode);
 settingsButton.addEventListener("click", openSettings);
 
 start();
-//loadTabs();
 
 // Same key format as background.js (its functions are private to it).
 function storageKey(tabId) {
@@ -57,7 +56,6 @@ applyTheme();
 // The checkbox was clicked: save the choice and rebuild the list.
 async function changeWindowsMode() {
     await browser.storage.local.set({ allWindows: allWindowsBox.checked });
-    //clearPreview();
     await loadTabs();
     showCurrentPreview();
 }
@@ -76,7 +74,6 @@ function showMatchingTabs() {
                                    (tab.title || "").toLowerCase().includes(text) ||
                                    (tab.url || "").toLowerCase().includes(text)
                                    );
-    //list.replaceChildren(...matches.map(makeRow));
     if (!allWindowsBox.checked) {
         list.replaceChildren(...matches.map(makeRow));
         return;
@@ -109,7 +106,6 @@ function rowsByWindow(matches) {
 function makeHeader(text, windowId) {
     const header = document.createElement("li");
     header.className = "window-header";
-    //header.textContent = text;
     
     const label = document.createElement("span");
     label.className = "title";
@@ -137,7 +133,6 @@ function makeHeader(text, windowId) {
 
 function makeRow(tab) {
     const row = document.createElement("li");
-    //row.textContent = tab.title || tab.url;
     if (isCurrentTab(tab)) {
         row.classList.add("active");
     }
@@ -235,7 +230,6 @@ async function closeTab(event, tab){
     }
     button.disabled = true;
     await browser.tabs.remove(tab.id);
-    //clearPreview();
     await loadTabs();
     showCurrentPreview();
 }
